@@ -129,11 +129,14 @@ export class DataService {
       if (error.status === 422) {
         // Unprocessable Entity error
         errorMessage = `Validation Error: ${JSON.stringify(error.error.detail)}`;
-      } else {
+      } 
+      else if (error.status === 400) {
+        errorMessage = `Email has been taken`
+      }
+      else {
         errorMessage = `Backend returned code ${error.status}, body was: ${JSON.stringify(error.error)}`;
       }
     }
-    console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
 
@@ -147,6 +150,14 @@ export class DataService {
           console.log(response);
           localStorage.setItem(this.tokenKey, response.access_token);
         })
+      );
+  }
+
+  register(email: string, password: string, role: string): any {
+    const userData = { email, password, role };
+    return this.http.post<any>(`${this.apiurl}/auth/register`, userData)
+      .pipe(
+        catchError(this.handleError)
       );
   }
 

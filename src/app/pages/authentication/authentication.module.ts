@@ -7,6 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatSelectChange } from '@angular/material/select';
+
 
 // icons
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -16,6 +18,7 @@ import { AuthenticationRoutes } from './authentication.routing';
 
 import { AppSideLoginComponent } from './login/login.component';
 import { AppSideRegisterComponent } from './register/register.component';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   imports: [
@@ -28,6 +31,7 @@ import { AppSideRegisterComponent } from './register/register.component';
     MatButtonModule,
     FormsModule,
     ReactiveFormsModule,
+    MatSelectModule,
     TablerIconsModule.pick(TablerIcons),
   ],
   declarations: [

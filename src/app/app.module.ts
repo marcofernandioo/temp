@@ -33,6 +33,8 @@ import { IntakeTableComponent } from './components/intake-table/intake-table.com
 import { TimelineTableComponent } from './components/timeline-table/timeline-table.component';
 import { TimelineComponent } from './pages/timeline/timeline.component';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSelectModule } from '@angular/material/select';
+
 
 import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/material/core';
 
@@ -62,6 +64,7 @@ import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/mate
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    MatSelectModule,
     MatIconModule,
     TablerIconsModule.pick(TablerIcons),
   ],

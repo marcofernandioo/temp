@@ -1,13 +1,23 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatSelectChange } from '@angular/material/select';
+import { DataService } from 'src/app/services/data.service';
+
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
 })
 export class AppSideRegisterComponent {
-  constructor(private router: Router) {}
+  password!: string;
+  email!: string;
+  role!: string;
+
+  constructor(
+    private router: Router,
+    private api: DataService,
+  ) {}
 
   form = new FormGroup({
     uname: new FormControl('', [Validators.required, Validators.minLength(6)]),
@@ -19,8 +29,18 @@ export class AppSideRegisterComponent {
     return this.form.controls;
   }
 
-  submit() {
-    // console.log(this.form.value);
-    this.router.navigate(['/dashboard']);
+  onClickRegister() {
+    this.api.register(this.email, this.password, this.role).subscribe({
+      next: (res: any) => {
+        this.router.navigate(['/auth/login'])
+      },
+      error: (err: any) => {
+        alert(err);
+      }
+    })
+  }
+
+  onSelectedGroupChange(event: MatSelectChange) {
+    this.role = event.value;
   }
 }
