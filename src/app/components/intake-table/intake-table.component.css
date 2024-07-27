@@ -1,0 +1,18 @@
+/* styles.css */
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button.mat-raised-button {
+  margin-left: auto;
+}
+
+.mat-form-field {
+  margin-bottom: 100px; /* Adjust margin as needed */
+}
+
+.mat-elevation-z8 {
+  margin-top: 32px; /* Adjust margin as needed */
+}

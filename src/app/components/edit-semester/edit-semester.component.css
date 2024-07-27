@@ -1,0 +1,61 @@
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  
+  .range-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .range-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-grow: 1;
+    width: calc(100% - 50px); /* Adjust based on the width of your action buttons */
+  }
+  
+  .range-content h3 {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .range-content mat-form-field {
+    margin-right: 10px;
+    flex-grow: 1;
+    min-width: 0; /* Allows flexbox to shrink the element below its content size */
+  }
+  
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .action-buttons button {
+    margin-left: 5px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .range-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .range-content {
+      width: 100%;
+    }
+  
+    .action-buttons {
+      margin-top: 10px;
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
