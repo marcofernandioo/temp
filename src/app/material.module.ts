@@ -40,13 +40,14 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatNativeDateModule } from '@angular/material/core';
-
+// import { MatFormFieldModule  } from '@angular/material/form-field';
 
 
 @NgModule({
   declarations: [],
   exports: [
     MatAutocompleteModule,
+    MatFormFieldModule,
     MatCheckboxModule,
     MatDatepickerModule,
     MatFormFieldModule,

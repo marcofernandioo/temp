@@ -1,0 +1,49 @@
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px; 
+  background-color: white;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  box-shadow: none;
+}
+
+.mat-column-name {
+  padding-right: 16px;
+  width: 30%;
+}
+
+.mat-column-code,
+.mat-column-semesters {
+  width: 35%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button {
+  display: block;
+  margin: 20px auto 0;
+}
+
+mat-progress-spinner {
+  margin: 20px auto;
+}
+
+.mat-header-cell {
+  font-weight: bold;
+  color: #333;
+}
+
+.mat-cell, .mat-header-cell {
+  padding: 12px 8px;
+}

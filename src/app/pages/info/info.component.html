@@ -1,1 +1,39 @@
-<p>info works!</p>
+<div class="container mat-elevation-z8">
+    <h1 class="mat-h1">Program Information</h1>
+  
+    <table mat-table [dataSource]="parentList"  *ngIf="parentList !== null; else loading">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Program</th>
+        <td mat-cell *matCellDef="let parent">{{parent.coursename || parent.programmename}}</td>
+      </ng-container>
+  
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef>Code</th>
+        <td mat-cell *matCellDef="let parent">
+          <mat-form-field appearance="outline">
+            <input matInput [(ngModel)]="parent.code" (ngModelChange)="checkForChanges()">
+          </mat-form-field>
+        </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="semesters">
+        <th mat-header-cell *matHeaderCellDef>Semesters</th>
+        <td mat-cell *matCellDef="let parent">
+          <mat-form-field appearance="outline">
+            <input matInput type="number" [(ngModel)]="parent.semesters" (ngModelChange)="checkForChanges()">
+          </mat-form-field>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="['name', 'code', 'semesters']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['name', 'code', 'semesters'];"></tr>
+    </table>
+  
+    <ng-template #loading>
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </ng-template>
+  
+    <button mat-raised-button color="primary" *ngIf="hasChanges" (click)="saveChanges()">
+      Save Changes
+    </button>
+  </div>

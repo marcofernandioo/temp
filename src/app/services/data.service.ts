@@ -51,8 +51,9 @@ export class DataService {
   }
 
   getHeaders(): HttpHeaders {
-    const token = this.getToken();
-
+    // const token = this.getToken();
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmFwdS5lZHUubXkiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MjIxMTA4ODN9.GixcKhLEOnxM4CtkSg3UkTzZWNo81Z30Hu5KdLbdXBA"
+    console.log(this.decodeToken());
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
@@ -117,6 +118,14 @@ export class DataService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  editProgramme(id: number, data: any) {
+    return this.http.patch<any[]>(`${this.apiurl}/admin/programmes/${id}`,  data, { headers: this.getHeaders() })
+  }
+
+  editCourse(id: number, data: any) {
+    return this.http.patch<any[]>(`${this.apiurl}/admin/course/${id}`, data, { headers: this.getHeaders() })
   }
 
   private handleError(error: HttpErrorResponse) {

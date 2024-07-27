@@ -32,8 +32,10 @@ import { EditSemesterComponent } from './components/edit-semester/edit-semester.
 import { IntakeTableComponent } from './components/intake-table/intake-table.component';
 import { TimelineTableComponent } from './components/timeline-table/timeline-table.component';
 import { TimelineComponent } from './pages/timeline/timeline.component';
+import { InfoComponent } from './pages/info/info.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/material/core';
@@ -50,6 +52,7 @@ import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/mate
     AppNavItemComponent,
     TimelineTableComponent,
     TimelineComponent,
+    InfoComponent,
     CreateGroupComponent,
     CreateIntakeComponent,
     CreateSemesterComponent,
@@ -65,6 +68,7 @@ import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/mate
     ReactiveFormsModule,
     MaterialModule,
     MatSelectModule,
+    MatProgressSpinnerModule,
     MatIconModule,
     TablerIconsModule.pick(TablerIcons),
   ],
