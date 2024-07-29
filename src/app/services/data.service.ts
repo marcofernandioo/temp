@@ -53,7 +53,6 @@ export class DataService {
   getHeaders(): HttpHeaders {
     // const token = this.getToken();
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBtYWlsLmFwdS5lZHUubXkiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3MjIxMTA4ODN9.GixcKhLEOnxM4CtkSg3UkTzZWNo81Z30Hu5KdLbdXBA"
-    console.log(this.decodeToken());
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
@@ -95,7 +94,6 @@ export class DataService {
   }
 
   getIntakesByYear(year: Number):  Observable<IIntake[]> {
-    console.log(year);
     return this.http.get<IIntake[]>(`${this.apiurl}/scheduler/intake/all?year=${year}`, { headers: this.getHeaders() });
   }
 
@@ -156,7 +154,6 @@ export class DataService {
       .pipe(
         tap(response => {
           // Store the token in localStorage
-          console.log(response);
           localStorage.setItem(this.tokenKey, response.access_token);
         })
       );

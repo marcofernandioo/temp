@@ -1,18 +1,24 @@
-<mat-form-field>
-    <mat-label>Select a Program / Course</mat-label>
-    <mat-select (selectionChange)="onSelectedParentChange($event)">
-      <mat-option value=" ">
-        All
-      </mat-option>
-      <mat-option *ngFor="let parent of parentList" [value]="parent">
-        {{ getParentName(parent) }}
-      </mat-option>
-    </mat-select>
-</mat-form-field>
-
-<mat-slide-toggle (change)="toggleView()">
-  {{ showTimeline ? 'Switch to Intake Table' : 'Switch to Timeline' }}
-</mat-slide-toggle>
+<div class="header-container">
+  <div class="left-content">
+    <mat-form-field>
+      <mat-label>Select a Program / Course</mat-label>
+      <mat-select (selectionChange)="onSelectedParentChange($event)">
+        <mat-option [value]="{ id: '', type: '' }">
+          All
+        </mat-option>
+        <mat-option *ngFor="let parent of parentList" [value]="parent">
+          {{ getParentName(parent) }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  
+  <div class="right-content">
+    <mat-slide-toggle (change)="toggleView()">
+      {{ showTimeline ? 'Switch to Intake Table' : 'Switch to Timeline' }}
+    </mat-slide-toggle>
+  </div>
+</div>
 
 <div [ngSwitch]="showTimeline">
   <app-timeline-table 

@@ -22,11 +22,11 @@ interface ITimeline {
 @Component({
   selector: 'app-timeline',
   templateUrl: './timeline.component.html',
-  styleUrls: ['./timeline.component.scss'],
+  styleUrls: ['./timeline.component.css'],
 })
 export class TimelineComponent implements OnInit {
   parentList: any[] = [];
-  // selectedParentName: string = '';
+
   selectedParentId: string = '';
   selectedParentType: string = '';
   selectedParentCode: string = '';
@@ -62,6 +62,7 @@ export class TimelineComponent implements OnInit {
   }
 
   onSelectedParentChange(event: MatSelectChange) {
+    // if (event.value.id === '' && event.value.type === '')
     this.selectedParentId = event.value.id;
     this.selectedParentCode = event.value.code;
     if (event.value.coursename)  {
@@ -69,10 +70,15 @@ export class TimelineComponent implements OnInit {
       this.selectedParentType = "course";
     }
 
-    if (event.value.programmename) {
+    else if (event.value.programmename) {
       this.selectedParentType = "programme";
       this.semesterNumbers = event.value.semesters;
+    } 
+    
+    else if (event.value.type == '') {
+      this.selectedParentType = event.value.type
     }
+
     this.loadTimelineDataset();
     this.cdr.detectChanges();
   }
@@ -118,28 +124,36 @@ export class TimelineComponent implements OnInit {
   // Formatting
   combineDataIntoTimeline(groups: IGroup[], intakes: IIntake[]): ITimeline[] {
     const timeline: ITimeline[] = [];
+    let idCounter = 1;
+    const intakeIdMap = new Map<number, number>();
+  
+    // First, assign new IDs to intakes and create a mapping
+    intakes.forEach(intake => {
+      intakeIdMap.set(intake.id, idCounter++);
+    });
   
     // Process groups
     groups.forEach(group => {
       const nestedGroups = intakes
         .filter(intake => intake.groupid === group.id)
-        .map(intake => intake.id);
+        .map(intake => intakeIdMap.get(intake.id)!);
   
       timeline.push({
-        id: group.id,
+        id: idCounter++,
         content: group.groupname,
         nestedGroups: nestedGroups.length > 0 ? nestedGroups : undefined
       });
     });
   
-    // Process intakes
+    // Add intakes to the timeline
     intakes.forEach(intake => {
       timeline.push({
-        id: intake.id,
+        id: intakeIdMap.get(intake.id)!,
         content: intake.code
       });
     });
   
+    console.log(JSON.stringify(timeline, null, 4));
     return timeline;
   }
 
@@ -160,14 +174,18 @@ export class TimelineComponent implements OnInit {
   }
 
   assignIntakeId(data: any[], intakeList: any[], tl: any[]) {
+    // Create a mapping of original intake IDs to new timeline IDs
+    const intakeIdMap = new Map(tl
+      .filter(item => intakeList.some(intake => intake.code === item.content))
+      .map(item => [intakeList.find(intake => intake.code === item.content)?.id, item.id]));
+  
     return data.map((object) => {
-      const intakeName = intakeList.find(int => int.id === object.intakeId)?.code;
-      const sumthing = tl.find(sem => sem.content === intakeName)?.id;
+      const newIntakeId = intakeIdMap.get(object.intakeId);
       return {
         ...object.data,
-        group: sumthing
+        group: newIntakeId
       }
-    })
+    });
 
   }
 
@@ -194,6 +212,7 @@ export class TimelineComponent implements OnInit {
 
     const finalSemesterData = this.assignIntakeId(transformedData, temporaryIntakes, timelineData);
     this.semesters = new DataSet(finalSemesterData);
+
   }
 
 }

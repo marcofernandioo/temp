@@ -1,0 +1,14 @@
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .left-content {
+    flex-grow: 1;
+  }
+  
+  .right-content {
+    margin-left: 20px;
+  }
