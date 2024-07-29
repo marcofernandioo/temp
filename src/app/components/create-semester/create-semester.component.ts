@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/fo
 import { DateAdapter } from '@angular/material/core';
 import { DataService } from 'src/app/services/data.service';
 import { MatSelectChange } from '@angular/material/select';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 interface DateRange {
   name: string;
@@ -57,6 +58,7 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     this.api.getIntakesByGroupIdList(list).subscribe({
       next: (response) => {
         this.availableIntakes = response;
+        console.log(JSON.stringify(response, null, 4));
       },
       error: (error) => {
         console.error('Error intakes:', error);
@@ -66,7 +68,28 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   onSelectedIntakeChange(event: MatSelectChange) {
+    // this.selectedIntakeID = event.value;
+
     this.selectedIntakeID = event.value;
+    const selectedIntake = this.findSelectedIntake(this.selectedIntakeID);
+    if (selectedIntake) {
+      this.updateFirstSemesterStartDate(new Date(selectedIntake.startdate));
+    }
+  }
+
+  findSelectedIntake(intakeId: Number): any {
+    return this.availableIntakes?.find(intake => intake.id === intakeId);
+  }
+
+  updateFirstSemesterStartDate(date: Date) {
+    const firstSemesterControl = this.dateRangeForm.get('semesters.semester1.semester');
+    if (firstSemesterControl) {
+      firstSemesterControl.patchValue({
+        startDate: date
+      });
+      // Trigger the date change to update other fields
+      this.onDateChange(date, 1, 'semester', 'startDate');
+    }
   }
 
   updateSemesters() {
@@ -120,11 +143,23 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   setupDateListeners(semesterNum: number, rangeName: string) {
+    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+    
+    // rangeGroup?.get('startDate')?.valueChanges.subscribe(() => this.updateEndDateOrDuration(semesterNum, rangeName));
+    // rangeGroup?.get('endDate')?.valueChanges.subscribe(() => this.updateStartDateOrDuration(semesterNum, rangeName));
+    // rangeGroup?.get('duration')?.valueChanges.subscribe(() => this.updateEndDate(semesterNum, rangeName));
+
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
     
-    rangeGroup?.get('startDate')?.valueChanges.subscribe(() => this.updateEndDateOrDuration(semesterNum, rangeName));
-    rangeGroup?.get('endDate')?.valueChanges.subscribe(() => this.updateStartDateOrDuration(semesterNum, rangeName));
-    rangeGroup?.get('duration')?.valueChanges.subscribe(() => this.updateEndDate(semesterNum, rangeName));
+    rangeGroup?.get('startDate')?.valueChanges.subscribe(date => 
+      this.onDateChange(date, semesterNum, rangeName, 'startDate')
+    );
+    rangeGroup?.get('endDate')?.valueChanges.subscribe(date => 
+      this.onDateChange(date, semesterNum, rangeName, 'endDate')
+    );
+    rangeGroup?.get('duration')?.valueChanges.subscribe(() => 
+      this.updateEndDate(semesterNum, rangeName)
+    );
   }
 
   updateEndDateOrDuration(semesterNum: number, rangeName: string) {
@@ -199,6 +234,19 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     return Object.keys(errors).length ? errors : null;
   }
 
+  onDateChange(event: MatDatepickerInputEvent<Date> | Date, semesterNum: number, rangeName: string, dateType: 'startDate' | 'endDate') {
+    const date = event instanceof Date ? event : event.value;
+    if (date) {
+      const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+      rangeGroup?.get(dateType)?.setValue(date);
+      if (dateType === 'startDate') {
+        this.updateEndDateOrDuration(semesterNum, rangeName);
+      } else {
+        this.updateStartDateOrDuration(semesterNum, rangeName);
+      }
+    }
+  }
+
   formatData(input: any): any {
     const output: any = [];
 
@@ -223,8 +271,6 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     });
     return output;
   }
-
-  
 
   formatDates(data: any): any {
     if (data instanceof Date) {
