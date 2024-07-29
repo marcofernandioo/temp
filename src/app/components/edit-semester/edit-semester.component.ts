@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnChanges, Input, SimpleChanges, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/services/data.service';
@@ -18,6 +18,7 @@ export class EditSemesterComponent implements OnInit, OnChanges {
   @Input() parentId: string | null = '';
   @Input() parentType: string | null = '';
   @Input() numberOfSemesters: any = 2;
+  @Output() refreshTimeline = new EventEmitter<void>();
 
   dateRangeForm!: FormGroup;
   semesters: number[] = [];
@@ -302,6 +303,7 @@ export class EditSemesterComponent implements OnInit, OnChanges {
     .subscribe({
       next: (res) => {
         alert("Semester Edited")
+        this.refreshTimeline.emit();
       },
       error: (err) => {
         console.log(err);

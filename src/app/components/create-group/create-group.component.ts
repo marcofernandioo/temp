@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 
 
@@ -12,6 +12,7 @@ export class CreateGroupComponent implements OnInit {
   groupname: string = '';
   @Input() parentId: string = '';
   @Input() parentType: string = '';
+  @Output() refreshTimeline = new EventEmitter<void>();
 
   constructor(private api: DataService) { }
 
@@ -27,8 +28,9 @@ export class CreateGroupComponent implements OnInit {
     }
     this.api.createGroup(groupObject).subscribe({
       next: (res) => {
-        console.log(res);
         alert("Group Created")
+        this.groupname = '';
+        this.refreshTimeline.emit();
       },
       error: (err) => {
         console.log(err);

@@ -35,13 +35,13 @@
 <br/>
 <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" animationDuration="0ms">
     <mat-tab label="Create Group">
-        <app-create-group [parentId]="selectedParentId" [parentType]="selectedParentType"></app-create-group>
+        <app-create-group [parentId]="selectedParentId" [parentType]="selectedParentType" (refreshTimeline)="onRefreshTimeline()"></app-create-group>
     </mat-tab>
     <mat-tab label="Create Intake">
-        <app-create-intake [parentId]="selectedParentId" [parentType]="selectedParentType" [parentCode]="selectedParentCode"></app-create-intake>
+        <app-create-intake [parentId]="selectedParentId" [parentType]="selectedParentType" [parentCode]="selectedParentCode" (refreshTimeline)="onRefreshTimeline()"></app-create-intake>
     </mat-tab>
     <mat-tab label="Create Semester">
-        <app-create-semester [parentId]="selectedParentId" [parentType]="selectedParentType" [numberOfSemesters]="semesterNumbers"></app-create-semester>
+        <app-create-semester [parentId]="selectedParentId" [parentType]="selectedParentType" [numberOfSemesters]="semesterNumbers" (refreshTimeline)="onRefreshTimeline()"></app-create-semester>
     </mat-tab>
     <mat-tab label="Edit Semester">
         <app-edit-semester [parentId]="selectedParentId" [parentType]="selectedParentType" [numberOfSemesters]="semesterNumbers"></app-edit-semester>

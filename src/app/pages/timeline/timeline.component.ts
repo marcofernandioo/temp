@@ -215,4 +215,9 @@ export class TimelineComponent implements OnInit {
 
   }
 
+  onRefreshTimeline() {
+    console.log('refresh')
+    this.loadTimelineDataset();
+  }
+
 }

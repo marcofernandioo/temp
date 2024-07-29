@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { MatSelectChange } from '@angular/material/select';
 import { DatePipe } from '@angular/common';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
@@ -33,6 +33,7 @@ export class CreateIntakeComponent implements OnInit, OnChanges {
   @Input() parentId: string | null = '';
   @Input() parentType: string | null = '';
   @Input() parentCode: string | null = '';
+  @Output() refreshTimeline = new EventEmitter<void>();
 
   selectedProgramme: string | null = '';
   groupList: any[] | null = null;
@@ -117,6 +118,13 @@ export class CreateIntakeComponent implements OnInit, OnChanges {
     this.api.createIntake(intakeData).subscribe({
       next: (response) => {
         alert('Intake Added Successfully')
+        this.refreshTimeline.emit();
+        this.selectedGroup = null;
+        this.intakePrefix = '';
+        this.duration = 1;
+        this.semesterStartDate = new Date();
+        this.semesterEndDate = new Date();
+        this.orientationDate = new Date();
       },
       error: (error) => {
         alert('Error creating intake, please try again')

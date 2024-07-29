@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { DataService } from 'src/app/services/data.service';
@@ -19,6 +19,7 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   @Input() parentId: string | null = '';
   @Input() parentType: string | null = '';
   @Input() numberOfSemesters: any = 2;
+  @Output() refreshData = new EventEmitter<void>();
 
   dateRangeForm!: FormGroup;
   selectedIntakeID!: Number;
@@ -355,10 +356,11 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
       const formData = this.dateRangeForm.value;
       const formattedData = this.formatDates(formData);
       const finalData = this.formatData(formattedData);
-      console.log(finalData);
+      // console.log(finalData);
       this.api.createBulkSemesters(finalData, this.selectedIntakeID).subscribe({
         next: (res) => {
           alert('Semester created successfully!')
+          this.refreshData.emit();
         },
         error: (err) => {
           console.log(err);
