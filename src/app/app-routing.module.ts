@@ -3,25 +3,21 @@ import { RouterModule, Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
 
-import { InfoComponent } from './pages/info/info.component';
-import { TimelineComponent } from './pages/timeline/timeline.component';
-
 const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'auth/login',
+    pathMatch: 'full'
+  },
   {
     path: '',
     component: FullComponent,
     children: [
       {
-        path: '',
-        redirectTo: 'auth',
-        pathMatch: 'full',
-      },
-      {
         path: 'dashboard',
         loadChildren: () =>
           import('./pages/pages.module').then((m) => m.PagesModule),
       },
-
     ],
   },
   {

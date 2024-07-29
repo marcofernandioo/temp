@@ -106,7 +106,32 @@ export class CreateIntakeComponent implements OnInit, OnChanges {
     return Math.floor(weeksDifference);
   }
 
+  validateInput() {
+    if (!this.semesterStartDate || !this.semesterEndDate || !this.selectedGroup || !this.orientationDate) {
+      alert("All the fields have to be filled");
+      return false
+    }
+
+    if (this.semesterStartDate === this.semesterEndDate) {
+      alert("Semester start date and end date cannot overlap")
+      return false
+    }
+
+    if (this.semesterEndDate < this.semesterStartDate) {
+      alert("Semester end date has to be later than start date")
+      return false
+    }
+
+    if (this.semesterStartDate < this.orientationDate) {
+      alert("Semester start date has to be later than orientation date")
+      return false
+    }
+
+    return true
+  }
+
   onSubmit() {
+    if(!this.validateInput()) return;
     const intakeData = {
       groupid: this.selectedGroup.id,
       code: this.intakePrefix,

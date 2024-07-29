@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/services/data.service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -14,14 +16,37 @@ export class AppSideLoginComponent {
   constructor(
     private api: HttpClient,
     private authService: DataService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService,
+    private sb: MatSnackBar
   ) { }
   
   ngOnInit(): void {
     
   }
 
+  validateInput(): boolean {
+    if (this.email == '' || this.password  == '') {
+      alert('Input cannot be empty');
+      return false;
+    }
+    if (!this.email.includes('@mail.apu.edu.my')) {
+      alert('Email must contain "@mail.apu.edu.my"');
+      return false;
+    }
+
+    if (this.password.length < 5) {
+      alert('Password must be at least 5 characters long');
+      return false;
+    }
+
+   
+    return true;
+  }
+
   onSubmit(): void {
+    if (!this.validateInput()) return;
+    
     this.authService.login(this.email, this.password)
       .subscribe({
         next: (response) => {
@@ -38,7 +63,6 @@ export class AppSideLoginComponent {
         },
         error: (error) => {
           console.error('Login failed', error);
-          // Alert the user about the failed login
           alert('Login failed. Please check your credentials and try again.');
         }
       })
