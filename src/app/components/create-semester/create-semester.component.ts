@@ -23,7 +23,7 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   dateRangeForm!: FormGroup;
   selectedIntakeID!: Number;
   semesters: number[] = [];
-  groupIdList: number [] | null = null;
+  groupIdList: number[] | null = null;
 
   availableIntakes: any[] | null = null;
   selectedIntake: any | null = null;
@@ -39,7 +39,7 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     private api: DataService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   loadGroupIdList() {
     this.api.getGroups(this.parentId, this.parentType).subscribe({
@@ -81,14 +81,39 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     return this.availableIntakes?.find(intake => intake.id === intakeId);
   }
 
-  updateFirstSemesterStartDate(date: Date) {
-    const firstSemesterControl = this.dateRangeForm.get('semesters.semester1.semester');
-    if (firstSemesterControl) {
-      firstSemesterControl.patchValue({
-        startDate: date
-      });
-      // Trigger the date change to update other fields
-      this.onDateChange(date, 1, 'semester', 'startDate');
+  updateFirstSemesterStartDate(startDate: Date) {
+    // const firstSemesterControl = this.dateRangeForm.get('semesters.semester1.semester');
+    // if (firstSemesterControl) {
+    //   firstSemesterControl.patchValue({
+    //     startDate: date
+    //   });
+    //   this.onDateChange(date, 1, 'semester', 'startDate');
+    // }
+    const semesterGroup = this.dateRangeForm.get('semesters.semester1');
+    if (semesterGroup) {
+      // Set semester start date
+      semesterGroup.get('semester.startDate')?.setValue(startDate);
+
+      // Calculate and set mid-semester break start date (7th week)
+      const midSemesterBreakStart = new Date(startDate);
+      midSemesterBreakStart.setDate(midSemesterBreakStart.getDate() + 6 * 7); // 6 weeks after start
+      semesterGroup.get('midSemesterBreak.startDate')?.setValue(midSemesterBreakStart);
+
+      // Calculate and set buffer week start date (15th week)
+      const bufferWeekStart = new Date(startDate);
+      bufferWeekStart.setDate(bufferWeekStart.getDate() + 14 * 7); // 14 weeks after start
+      semesterGroup.get('bufferWeek.startDate')?.setValue(bufferWeekStart);
+
+      // Calculate and set exam week start date (right after buffer week)
+      const examWeekStart = new Date(bufferWeekStart);
+      examWeekStart.setDate(examWeekStart.getDate() + 7); // 1 week after buffer week starts
+      semesterGroup.get('exams.startDate')?.setValue(examWeekStart);
+
+      // Trigger updates for each date change
+      this.onDateChange(startDate, 1, 'semester', 'startDate');
+      this.onDateChange(midSemesterBreakStart, 1, 'midSemesterBreak', 'startDate');
+      this.onDateChange(bufferWeekStart, 1, 'bufferWeek', 'startDate');
+      this.onDateChange(examWeekStart, 1, 'exams', 'startDate');
     }
   }
 
@@ -104,12 +129,12 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['parentId'] || changes['parentType'] || changes['numberOfSemesters']) {
       this.loadGroupIdList();
-      
+
       if (changes['numberOfSemesters']) {
         this.updateSemesters();
         this.initForm();
       }
-      
+
       this.cdr.detectChanges();
     }
   }
@@ -119,7 +144,7 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
 
     this.semesters.forEach(semesterNum => {
       const semesterGroup = this.fb.group({});
-      
+
       this.dateRanges.forEach(range => {
         semesterGroup.addControl(range.name, this.fb.group({
           startDate: ['', Validators.required],
@@ -144,66 +169,95 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
 
   setupDateListeners(semesterNum: number, rangeName: string) {
     // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
-    
+
     // rangeGroup?.get('startDate')?.valueChanges.subscribe(() => this.updateEndDateOrDuration(semesterNum, rangeName));
     // rangeGroup?.get('endDate')?.valueChanges.subscribe(() => this.updateStartDateOrDuration(semesterNum, rangeName));
     // rangeGroup?.get('duration')?.valueChanges.subscribe(() => this.updateEndDate(semesterNum, rangeName));
 
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
-    
-    rangeGroup?.get('startDate')?.valueChanges.subscribe(date => 
+
+    rangeGroup?.get('startDate')?.valueChanges.subscribe(date =>
       this.onDateChange(date, semesterNum, rangeName, 'startDate')
     );
-    rangeGroup?.get('endDate')?.valueChanges.subscribe(date => 
+    rangeGroup?.get('endDate')?.valueChanges.subscribe(date =>
       this.onDateChange(date, semesterNum, rangeName, 'endDate')
     );
-    rangeGroup?.get('duration')?.valueChanges.subscribe(() => 
+    rangeGroup?.get('duration')?.valueChanges.subscribe(() =>
       this.updateEndDate(semesterNum, rangeName)
     );
   }
 
   updateEndDateOrDuration(semesterNum: number, rangeName: string) {
+    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+    // const startDate = rangeGroup?.get('startDate')?.value;
+    // const endDate = rangeGroup?.get('endDate')?.value;
+    // const duration = rangeGroup?.get('duration')?.value;
+
+    // if (startDate && duration) {
+    //   const newEndDate = new Date(startDate);
+    //   newEndDate.setDate(newEndDate.getDate() + duration * 7);
+    //   rangeGroup?.get('endDate')?.setValue(newEndDate, { emitEvent: false });
+    // } else if (startDate && endDate) {
+    //   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    //   rangeGroup?.get('duration')?.setValue(Math.round(diffDays / 7), { emitEvent: false });
+    // }
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
     const startDate = rangeGroup?.get('startDate')?.value;
     const endDate = rangeGroup?.get('endDate')?.value;
-    const duration = rangeGroup?.get('duration')?.value;
 
-    if (startDate && duration) {
-      const newEndDate = new Date(startDate);
-      newEndDate.setDate(newEndDate.getDate() + duration * 7);
-      rangeGroup?.get('endDate')?.setValue(newEndDate, { emitEvent: false });
-    } else if (startDate && endDate) {
+    if (startDate && endDate) {
       const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      rangeGroup?.get('duration')?.setValue(Math.round(diffDays / 7), { emitEvent: false });
+      const durationInWeeks = Math.ceil(diffDays / 7);
+      rangeGroup?.get('duration')?.setValue(durationInWeeks, { emitEvent: false });
     }
   }
 
   updateStartDateOrDuration(semesterNum: number, rangeName: string) {
+    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+    // const startDate = rangeGroup?.get('startDate')?.value;
+    // const endDate = rangeGroup?.get('endDate')?.value;
+    // const duration = rangeGroup?.get('duration')?.value;
+
+    // if (endDate && duration) {
+    //   const newStartDate = new Date(endDate);
+    //   newStartDate.setDate(newStartDate.getDate() - duration * 7);
+    //   rangeGroup?.get('startDate')?.setValue(newStartDate, { emitEvent: false });
+    // } else if (startDate && endDate) {
+    //   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+    //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    //   rangeGroup?.get('duration')?.setValue(Math.round(diffDays / 7), { emitEvent: false });
+    // }
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
     const startDate = rangeGroup?.get('startDate')?.value;
     const endDate = rangeGroup?.get('endDate')?.value;
-    const duration = rangeGroup?.get('duration')?.value;
 
-    if (endDate && duration) {
-      const newStartDate = new Date(endDate);
-      newStartDate.setDate(newStartDate.getDate() - duration * 7);
-      rangeGroup?.get('startDate')?.setValue(newStartDate, { emitEvent: false });
-    } else if (startDate && endDate) {
+    if (startDate && endDate) {
       const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      rangeGroup?.get('duration')?.setValue(Math.round(diffDays / 7), { emitEvent: false });
+      const durationInWeeks = Math.ceil(diffDays / 7);
+      rangeGroup?.get('duration')?.setValue(durationInWeeks, { emitEvent: false });
     }
   }
 
   updateEndDate(semesterNum: number, rangeName: string) {
+    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+    // const startDate = rangeGroup?.get('startDate')?.value;
+    // const duration = rangeGroup?.get('duration')?.value;
+
+    // if (startDate && duration) {
+    //   const newEndDate = new Date(startDate);
+    //   newEndDate.setDate(newEndDate.getDate() + duration * 7);
+    //   rangeGroup?.get('endDate')?.setValue(newEndDate, { emitEvent: false });
+    // }
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
     const startDate = rangeGroup?.get('startDate')?.value;
     const duration = rangeGroup?.get('duration')?.value;
 
     if (startDate && duration) {
       const newEndDate = new Date(startDate);
-      newEndDate.setDate(newEndDate.getDate() + duration * 7);
+      newEndDate.setDate(newEndDate.getDate() + duration * 7 - 1);
       rangeGroup?.get('endDate')?.setValue(newEndDate, { emitEvent: false });
     }
   }
@@ -319,13 +373,13 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
 
   resetForm() {
     this.dateRangeForm.reset();
-    
+
     // Re-initialize the form with empty values
     const semestersControl = this.dateRangeForm.get('semesters') as FormGroup;
-    
+
     this.semesters.forEach(semesterNum => {
       const semesterGroup = semestersControl.get('semester' + semesterNum) as FormGroup;
-      
+
       this.dateRanges.forEach(range => {
         const rangeGroup = semesterGroup.get(range.name) as FormGroup;
         rangeGroup.patchValue({
@@ -336,5 +390,5 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
       });
     });
   }
- 
+
 }
