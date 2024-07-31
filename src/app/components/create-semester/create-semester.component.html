@@ -34,6 +34,15 @@
             <input matInput type="number" formControlName="duration">
           </mat-form-field>
 
+          <ng-container *ngIf="range.isSemester">
+            <mat-radio-group formControlName="durationOption" class="duration-options">
+              <mat-radio-button value="12">12 weeks</mat-radio-button>
+              <mat-radio-button value="14">14 weeks</mat-radio-button>
+              <mat-radio-button value="15">15 weeks</mat-radio-button>
+            </mat-radio-group>
+          </ng-container>
+          
+          
         </div>
       </div>
     </div>

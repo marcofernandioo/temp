@@ -8,6 +8,7 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 interface DateRange {
   name: string;
   label: string;
+  isSemester?: boolean;
 }
 
 @Component({
@@ -39,7 +40,7 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   };
 
   dateRanges: DateRange[] = [
-    { name: 'semester', label: 'Semester' },
+    { name: 'semester', label: 'Semester', isSemester: true },
     { name: 'midSemesterBreak', label: 'Mid-Semester Break' },
     { name: 'bufferWeek', label: 'Buffer Week' },
     { name: 'exams', label: 'Exams' },
@@ -177,15 +178,21 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
 
     this.semesters.forEach(semesterNum => {
       const semesterGroup = this.fb.group({});
-
+  
       this.dateRanges.forEach(range => {
-        semesterGroup.addControl(range.name, this.fb.group({
+        const rangeControls: any = {
           startDate: ['', Validators.required],
           endDate: ['', Validators.required],
           duration: ['', [Validators.required, Validators.min(range.name === 'semester' ? 1 : 0)]]
-        }));
+        };
+  
+        if (range.isSemester) {
+          rangeControls['durationOption'] = [''];
+        }
+  
+        semesterGroup.addControl(range.name, this.fb.group(rangeControls));
       });
-
+  
       semestersGroup.addControl(`semester${semesterNum}`, semesterGroup);
     });
 
@@ -212,6 +219,21 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     rangeGroup?.get('duration')?.valueChanges.subscribe(() =>
       this.updateEndDate(semesterNum, rangeName)
     );
+    if (this.dateRanges.find(r => r.name === rangeName)?.isSemester) {
+      rangeGroup?.get('durationOption')?.valueChanges.subscribe(() =>
+        this.onDurationOptionChange(semesterNum, rangeName)
+      );
+    }
+  }
+
+  onDurationOptionChange(semesterNum: number, rangeName: string) {
+    const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+    const durationOption = rangeGroup?.get('durationOption')?.value;
+    
+    if (durationOption) {
+      rangeGroup?.get('duration')?.setValue(parseInt(durationOption), { emitEvent: false });
+      this.updateEndDate(semesterNum, rangeName);
+    }
   }
 
   updateEndDateOrDuration(semesterNum: number, rangeName: string) {

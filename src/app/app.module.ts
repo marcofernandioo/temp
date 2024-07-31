@@ -37,6 +37,7 @@ import { InfoComponent } from './pages/info/info.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatRadioButton } from '@angular/material/radio';
 
 
 import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/material/core';
@@ -72,6 +73,7 @@ import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/mate
     MatProgressSpinnerModule,
     MatIconModule,
     MatNativeDateModule,
+    MatRadioButton,
     TablerIconsModule.pick(TablerIcons),
     ToastrModule.forRoot()
   ],
