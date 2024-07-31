@@ -57,7 +57,6 @@ export class EditSemesterComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['parentId'] || changes['parentType'] || changes['numberOfSemesters']) {
-      console.log(this.parentId, this.parentType);
       this.loadGroupIdList();
       if (changes['numberOfSemesters']) {
         this.updateSemesters();

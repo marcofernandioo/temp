@@ -146,7 +146,6 @@ export class TimelineComponent implements OnInit {
       });
     });
   
-    console.log(JSON.stringify(timeline, null, 4));
     return timeline;
   }
 

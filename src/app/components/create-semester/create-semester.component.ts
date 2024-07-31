@@ -386,7 +386,8 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   submitForm() {
-    if (this.dateRangeForm.valid) {
+    console.log(this.dateRangeForm);
+    // if (this.dateRangeForm.valid) {
       console.log(this.dateRangeForm);
       const formData = this.dateRangeForm.value;
 
@@ -403,9 +404,9 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
         }
       })
       this.resetForm();
-    } else {
-      alert('Form is invalid. Please check all fields.');
-    }
+    // } else {
+    //   alert('Form is invalid. Please check all fields.');
+    // }
   }
 
   resetForm() {
