@@ -5,7 +5,6 @@ import { saveAs } from 'file-saver';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 
-
 import { IIntake } from 'src/app/interfaces/intake.interface';
 
 @Component({

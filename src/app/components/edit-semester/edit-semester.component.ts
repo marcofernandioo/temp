@@ -42,8 +42,13 @@ export class EditSemesterComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private api: DataService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
+  onlyMondays(date: any) {
+    var day = date.getDay();
+    return day === 1;
+  }
+  
   ngOnInit() {
     this.initForm();
   }
@@ -100,13 +105,27 @@ export class EditSemesterComponent implements OnInit, OnChanges {
 
     this.semesters.forEach(semesterNum => {
       const semesterGroup = this.fb.group({});
-      
+
       this.dateRanges.forEach(range => {
-        semesterGroup.addControl(range.name, this.fb.group({
+        // semesterGroup.addControl(range.name, this.fb.group({
+        //   startDate: [''],
+        //   endDate: [''],
+        //   duration: ['']
+        // }));
+
+        // this.editingState[`semester${semesterNum}_${range.name}`] = false;
+        const rangeGroup = this.fb.group({
           startDate: [''],
           endDate: [''],
           duration: ['']
-        }));
+        });
+
+        // Add value change listeners
+        rangeGroup.get('startDate')?.valueChanges.subscribe(() => this.calculateEndDateOrDuration(semesterNum, range.name));
+        rangeGroup.get('endDate')?.valueChanges.subscribe(() => this.calculateDuration(semesterNum, range.name));
+        rangeGroup.get('duration')?.valueChanges.subscribe(() => this.calculateEndDate(semesterNum, range.name));
+
+        semesterGroup.addControl(range.name, rangeGroup);
         this.editingState[`semester${semesterNum}_${range.name}`] = false;
       });
 
@@ -119,6 +138,44 @@ export class EditSemesterComponent implements OnInit, OnChanges {
       this.dateRangeForm = this.fb.group({
         semesters: semestersGroup
       });
+    }
+  }
+
+  calculateEndDateOrDuration(semesterNum: number, rangeName: string) {
+    const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`) as FormGroup;
+    const startDate = rangeGroup.get('startDate')?.value;
+    const endDate = rangeGroup.get('endDate')?.value;
+    const duration = rangeGroup.get('duration')?.value;
+
+    if (startDate && duration) {
+      const calculatedEndDate = new Date(startDate);
+      calculatedEndDate.setDate(calculatedEndDate.getDate() + duration * 7);
+      rangeGroup.patchValue({ endDate: calculatedEndDate }, { emitEvent: false });
+    } else if (startDate && endDate) {
+      this.calculateDuration(semesterNum, rangeName);
+    }
+  }
+
+  calculateEndDate(semesterNum: number, rangeName: string) {
+    const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`) as FormGroup;
+    const startDate = rangeGroup.get('startDate')?.value;
+    const duration = rangeGroup.get('duration')?.value;
+
+    if (startDate && duration) {
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + duration * 7);
+      rangeGroup.patchValue({ endDate: endDate }, { emitEvent: false });
+    }
+  }
+
+  calculateDuration(semesterNum: number, rangeName: string) {
+    const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`) as FormGroup;
+    const startDate = rangeGroup.get('startDate')?.value;
+    const endDate = rangeGroup.get('endDate')?.value;
+
+    if (startDate && endDate) {
+      const duration = this.calculateWeeks(new Date(startDate), new Date(endDate));
+      rangeGroup.patchValue({ duration: duration }, { emitEvent: false });
     }
   }
 
@@ -142,7 +199,7 @@ export class EditSemesterComponent implements OnInit, OnChanges {
     semesterData.forEach((semester) => {
       const semesterNumber = semester.name.split(' ')[1];
       const semesterGroup = (this.dateRangeForm.get('semesters') as FormGroup).get(`semester${semesterNumber}`) as FormGroup;
-      
+
       if (semesterGroup) {
         // Populate semester dates
         semesterGroup.get('semester')?.patchValue({
@@ -150,21 +207,21 @@ export class EditSemesterComponent implements OnInit, OnChanges {
           endDate: new Date(semester.enddate),
           duration: this.calculateWeeks(new Date(semester.startdate), new Date(semester.enddate))
         });
-  
+
         // Populate mid-semester break dates
         semesterGroup.get('midSemesterBreak')?.patchValue({
           startDate: new Date(semester.midsemstart),
           endDate: new Date(semester.midsemend),
           duration: semester.midsemduration
         });
-  
+
         // Populate buffer week dates
         semesterGroup.get('bufferWeek')?.patchValue({
           startDate: new Date(semester.bufferstart),
           endDate: new Date(semester.bufferend),
           duration: semester.buffersemduration
         });
-  
+
         // Populate exam dates
         semesterGroup.get('exams')?.patchValue({
           startDate: new Date(semester.examstart),
@@ -173,7 +230,7 @@ export class EditSemesterComponent implements OnInit, OnChanges {
         });
       }
     });
-  
+
     // After populating, disable all controls
     this.disableAllControls();
   }
@@ -192,15 +249,32 @@ export class EditSemesterComponent implements OnInit, OnChanges {
   }
 
   toggleEdit(semesterNumber: number, rangeName: string) {
+    // const key = `semester${semesterNumber}_${rangeName}`;
+    // const semesterGroup = this.dateRangeForm.get('semesters')?.get(`semester${semesterNumber}`) as FormGroup;
+    // const rangeGroup = semesterGroup?.get(rangeName) as FormGroup;
+
+    // if (!this.editingState[key]) {
+    //   // Start editing
+    //   this.editingState[key] = true;
+    //   this.originalValues[key] = {...rangeGroup.value};
+    //   rangeGroup.enable();
+    // } else {
+    //   // Stop editing (this branch probably won't be used now, but kept for consistency)
+    //   this.editingState[key] = false;
+    //   rangeGroup.disable();
+    // }
     const key = `semester${semesterNumber}_${rangeName}`;
     const semesterGroup = this.dateRangeForm.get('semesters')?.get(`semester${semesterNumber}`) as FormGroup;
     const rangeGroup = semesterGroup?.get(rangeName) as FormGroup;
-    
+
     if (!this.editingState[key]) {
       // Start editing
       this.editingState[key] = true;
-      this.originalValues[key] = {...rangeGroup.value};
+      this.originalValues[key] = { ...rangeGroup.value };
       rangeGroup.enable();
+
+      // Perform initial calculations
+      this.calculateEndDateOrDuration(semesterNumber, rangeName);
     } else {
       // Stop editing (this branch probably won't be used now, but kept for consistency)
       this.editingState[key] = false;
@@ -218,6 +292,9 @@ export class EditSemesterComponent implements OnInit, OnChanges {
     const semesterGroup = this.dateRangeForm.get('semesters')?.get(`semester${semesterNumber}`) as FormGroup;
     const rangeGroup = semesterGroup?.get(rangeName) as FormGroup;
 
+    // Perform final calculations before saving
+    this.calculateEndDateOrDuration(semesterNumber, rangeName);
+
     // Get the entire form data
     rangeGroup.patchValue(this.dateRangeForm.value.semesters[`semester${semesterNumber}`].semester)
 
@@ -232,18 +309,18 @@ export class EditSemesterComponent implements OnInit, OnChanges {
     const key = `semester${semesterNumber}_${rangeName}`;
     const semesterGroup = this.dateRangeForm.get('semesters')?.get(`semester${semesterNumber}`) as FormGroup;
     const rangeGroup = semesterGroup?.get(rangeName) as FormGroup;
-    
+
     // Revert to original values
     if (this.originalValues[key]) {
       rangeGroup.patchValue(this.originalValues[key]);
       delete this.originalValues[key]; // Clean up stored original values
     }
-    
+
     rangeGroup.disable();
     this.editingState[key] = false;
   }
 
-  
+
   formatData(input: any): any {
     const output: any = [];
 
@@ -265,7 +342,7 @@ export class EditSemesterComponent implements OnInit, OnChanges {
       };
       output.push(newSemester);
     });
-  
+
     return output;
   }
 
@@ -294,20 +371,20 @@ export class EditSemesterComponent implements OnInit, OnChanges {
   }
 
   submitForm() {
-    
+
     const formData = this.dateRangeForm.value;
     const formattedData = this.formatDates(formData);
     const finalData = this.formatData(formattedData);
 
     this.api.editSemestersByIntakeId(`${this.selectedIntakeID}`, finalData)
-    .subscribe({
-      next: (res) => {
-        alert("Semester Edited")
-        this.refreshTimeline.emit();
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    })
+      .subscribe({
+        next: (res) => {
+          alert("Semester Edited")
+          this.refreshTimeline.emit();
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      })
   }
 }

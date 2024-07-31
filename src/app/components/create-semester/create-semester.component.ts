@@ -29,6 +29,15 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   availableIntakes: any[] | null = null;
   selectedIntake: any | null = null;
 
+  private updatingDates = false;
+
+  defaultDurations = {
+    semester: 14,
+    midSemesterBreak: 1,
+    bufferWeek: 1,
+    exams: 2
+  };
+
   dateRanges: DateRange[] = [
     { name: 'semester', label: 'Semester' },
     { name: 'midSemesterBreak', label: 'Mid-Semester Break' },
@@ -41,6 +50,11 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) { }
+
+  onlyMondays(date: any) {
+    var day = date.getDay();
+    return day === 1;
+  }
 
   loadGroupIdList() {
     this.api.getGroups(this.parentId, this.parentType).subscribe({
@@ -59,7 +73,6 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
     this.api.getIntakesByGroupIdList(list).subscribe({
       next: (response) => {
         this.availableIntakes = response;
-        console.log(JSON.stringify(response, null, 4));
       },
       error: (error) => {
         console.error('Error intakes:', error);
@@ -69,7 +82,6 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   onSelectedIntakeChange(event: MatSelectChange) {
-    // this.selectedIntakeID = event.value;
 
     this.selectedIntakeID = event.value;
     const selectedIntake = this.findSelectedIntake(this.selectedIntakeID);
@@ -83,13 +95,6 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   updateFirstSemesterStartDate(startDate: Date) {
-    // const firstSemesterControl = this.dateRangeForm.get('semesters.semester1.semester');
-    // if (firstSemesterControl) {
-    //   firstSemesterControl.patchValue({
-    //     startDate: date
-    //   });
-    //   this.onDateChange(date, 1, 'semester', 'startDate');
-    // }
     const semesterGroup = this.dateRangeForm.get('semesters.semester1');
     if (semesterGroup) {
       // Set semester start date
@@ -115,6 +120,33 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
       this.onDateChange(midSemesterBreakStart, 1, 'midSemesterBreak', 'startDate');
       this.onDateChange(bufferWeekStart, 1, 'bufferWeek', 'startDate');
       this.onDateChange(examWeekStart, 1, 'exams', 'startDate');
+      // Set semester start date and duration
+      // semesterGroup.get('semester.startDate')?.setValue(startDate, { emitEvent: false });
+      // semesterGroup.get('semester.duration')?.setValue(this.defaultDurations.semester, { emitEvent: false });
+
+      // // Calculate and set mid-semester break
+      // const midSemesterBreakStart = new Date(startDate);
+      // midSemesterBreakStart.setDate(midSemesterBreakStart.getDate() + this.defaultDurations.semester * 7 / 2);
+      // semesterGroup.get('midSemesterBreak.startDate')?.setValue(midSemesterBreakStart, { emitEvent: false });
+      // semesterGroup.get('midSemesterBreak.duration')?.setValue(this.defaultDurations.midSemesterBreak, { emitEvent: false });
+
+      // // Calculate and set buffer week
+      // const bufferWeekStart = new Date(startDate);
+      // bufferWeekStart.setDate(bufferWeekStart.getDate() + this.defaultDurations.semester * 7);
+      // semesterGroup.get('bufferWeek.startDate')?.setValue(bufferWeekStart, { emitEvent: false });
+      // semesterGroup.get('bufferWeek.duration')?.setValue(this.defaultDurations.bufferWeek, { emitEvent: false });
+
+      // // Calculate and set exam week
+      // const examWeekStart = new Date(bufferWeekStart);
+      // examWeekStart.setDate(examWeekStart.getDate() + this.defaultDurations.bufferWeek * 7);
+      // semesterGroup.get('exams.startDate')?.setValue(examWeekStart, { emitEvent: false });
+      // semesterGroup.get('exams.duration')?.setValue(this.defaultDurations.exams, { emitEvent: false });
+
+      // // Update end dates
+      // this.updateEndDate(semesterNum, 'semester');
+      // this.updateEndDate(semesterNum, 'midSemesterBreak');
+      // this.updateEndDate(semesterNum, 'bufferWeek');
+      // this.updateEndDate(semesterNum, 'exams');
     }
   }
 
@@ -169,12 +201,6 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   setupDateListeners(semesterNum: number, rangeName: string) {
-    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
-
-    // rangeGroup?.get('startDate')?.valueChanges.subscribe(() => this.updateEndDateOrDuration(semesterNum, rangeName));
-    // rangeGroup?.get('endDate')?.valueChanges.subscribe(() => this.updateStartDateOrDuration(semesterNum, rangeName));
-    // rangeGroup?.get('duration')?.valueChanges.subscribe(() => this.updateEndDate(semesterNum, rangeName));
-
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
 
     rangeGroup?.get('startDate')?.valueChanges.subscribe(date =>
@@ -189,20 +215,8 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   updateEndDateOrDuration(semesterNum: number, rangeName: string) {
-    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
-    // const startDate = rangeGroup?.get('startDate')?.value;
-    // const endDate = rangeGroup?.get('endDate')?.value;
-    // const duration = rangeGroup?.get('duration')?.value;
+    if (this.updatingDates) return;
 
-    // if (startDate && duration) {
-    //   const newEndDate = new Date(startDate);
-    //   newEndDate.setDate(newEndDate.getDate() + duration * 7);
-    //   rangeGroup?.get('endDate')?.setValue(newEndDate, { emitEvent: false });
-    // } else if (startDate && endDate) {
-    //   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    //   rangeGroup?.get('duration')?.setValue(Math.round(diffDays / 7), { emitEvent: false });
-    // }
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
     const startDate = rangeGroup?.get('startDate')?.value;
     const endDate = rangeGroup?.get('endDate')?.value;
@@ -216,20 +230,8 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   updateStartDateOrDuration(semesterNum: number, rangeName: string) {
-    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
-    // const startDate = rangeGroup?.get('startDate')?.value;
-    // const endDate = rangeGroup?.get('endDate')?.value;
-    // const duration = rangeGroup?.get('duration')?.value;
+    if (this.updatingDates) return;
 
-    // if (endDate && duration) {
-    //   const newStartDate = new Date(endDate);
-    //   newStartDate.setDate(newStartDate.getDate() - duration * 7);
-    //   rangeGroup?.get('startDate')?.setValue(newStartDate, { emitEvent: false });
-    // } else if (startDate && endDate) {
-    //   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-    //   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    //   rangeGroup?.get('duration')?.setValue(Math.round(diffDays / 7), { emitEvent: false });
-    // }
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
     const startDate = rangeGroup?.get('startDate')?.value;
     const endDate = rangeGroup?.get('endDate')?.value;
@@ -243,15 +245,6 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   updateEndDate(semesterNum: number, rangeName: string) {
-    // const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
-    // const startDate = rangeGroup?.get('startDate')?.value;
-    // const duration = rangeGroup?.get('duration')?.value;
-
-    // if (startDate && duration) {
-    //   const newEndDate = new Date(startDate);
-    //   newEndDate.setDate(newEndDate.getDate() + duration * 7);
-    //   rangeGroup?.get('endDate')?.setValue(newEndDate, { emitEvent: false });
-    // }
     const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
     const startDate = rangeGroup?.get('startDate')?.value;
     const duration = rangeGroup?.get('duration')?.value;
@@ -290,14 +283,31 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
   }
 
   onDateChange(event: MatDatepickerInputEvent<Date> | Date, semesterNum: number, rangeName: string, dateType: 'startDate' | 'endDate') {
+    // const date = event instanceof Date ? event : event.value;
+    // if (date) {
+    //   const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+    //   rangeGroup?.get(dateType)?.setValue(date);
+    //   if (dateType === 'startDate') {
+    //     this.updateEndDateOrDuration(semesterNum, rangeName);
+    //   } else {
+    //     this.updateStartDateOrDuration(semesterNum, rangeName);
+    //   }
+    // }
+    if (this.updatingDates) return;
+
     const date = event instanceof Date ? event : event.value;
     if (date) {
-      const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
-      rangeGroup?.get(dateType)?.setValue(date);
-      if (dateType === 'startDate') {
-        this.updateEndDateOrDuration(semesterNum, rangeName);
-      } else {
-        this.updateStartDateOrDuration(semesterNum, rangeName);
+      this.updatingDates = true;
+      try {
+        const rangeGroup = this.dateRangeForm.get(`semesters.semester${semesterNum}.${rangeName}`);
+        rangeGroup?.get(dateType)?.setValue(date, { emitEvent: false });
+        if (dateType === 'startDate') {
+          this.updateEndDateOrDuration(semesterNum, rangeName);
+        } else {
+          this.updateStartDateOrDuration(semesterNum, rangeName);
+        }
+      } finally {
+        this.updatingDates = false;
       }
     }
   }
@@ -353,23 +363,24 @@ export class CreateSemesterComponent implements OnInit, OnChanges {
 
   submitForm() {
     if (this.dateRangeForm.valid) {
+      console.log(this.dateRangeForm);
       const formData = this.dateRangeForm.value;
+
       const formattedData = this.formatDates(formData);
       const finalData = this.formatData(formattedData);
-      // console.log(finalData);
       this.api.createBulkSemesters(finalData, this.selectedIntakeID).subscribe({
         next: (res) => {
           alert('Semester created successfully!')
           this.refreshData.emit();
         },
         error: (err) => {
-          console.log(err);
+          console.error(err);
           alert('Error creating semester. Try again.')
         }
       })
       this.resetForm();
     } else {
-      console.log('Form is invalid. Please check all fields.');
+      alert('Form is invalid. Please check all fields.');
     }
   }
 

@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { DataService } from 'src/app/services/data.service';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -14,16 +11,11 @@ export class AppSideLoginComponent {
   password: string = '';
 
   constructor(
-    private api: HttpClient,
     private authService: DataService,
     private router: Router,
-    private toastr: ToastrService,
-    private sb: MatSnackBar
   ) { }
   
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void { }
 
   validateInput(): boolean {
     if (this.email == '' || this.password  == '') {
@@ -39,8 +31,6 @@ export class AppSideLoginComponent {
       alert('Password must be at least 5 characters long');
       return false;
     }
-
-   
     return true;
   }
 

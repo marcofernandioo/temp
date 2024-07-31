@@ -5,8 +5,6 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 
 import { DataService } from 'src/app/services/data.service';
 
-// Custom date formats        console.log(error);
-
 export const MY_DATE_FORMATS = {
   parse: {
     dateInput: 'YYYY-MM-DD',
@@ -18,7 +16,6 @@ export const MY_DATE_FORMATS = {
     monthYearA11yLabel: 'MMMM YYYY',
   },
 };
-
 
 @Component({
   selector: 'app-create-intake',
@@ -47,6 +44,11 @@ export class CreateIntakeComponent implements OnInit, OnChanges {
   constructor(private api: DataService) {
   }
 
+  onlyMondays(date: any) {
+    var day = date.getDay();
+    return day === 1;
+  }
+
   formatDateToYYYYMMDD(date: Date): string {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -54,7 +56,6 @@ export class CreateIntakeComponent implements OnInit, OnChanges {
     
     return `${year}-${month}-${day}`;
   }
-
 
   ngOnInit(): void {
   }

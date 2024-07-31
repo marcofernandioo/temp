@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatSelectChange } from '@angular/material/select';
 import { DataService } from 'src/app/services/data.service';
-
 
 @Component({
   selector: 'app-register',
@@ -19,17 +17,6 @@ export class AppSideRegisterComponent {
     private api: DataService,
   ) {}
 
-  form = new FormGroup({
-    uname: new FormControl('', [Validators.required, Validators.minLength(6)]),
-    email: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
-  });
-
-  get f() {
-    return this.form.controls;
-  }
-
-  
   validateInput(): boolean {
     if (this.email == '' || this.password  == '') {
       alert('Input cannot be empty');

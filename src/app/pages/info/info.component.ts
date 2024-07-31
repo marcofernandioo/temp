@@ -1,14 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
-import { CanDeactivate } from '@angular/router';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-info',
   templateUrl: './info.component.html',
   styleUrl: './info.component.css'
 })
-export class InfoComponent implements OnInit, CanDeactivate<InfoComponent> {
+export class InfoComponent implements OnInit {
 
   parentList: any[] | null = null;
   originalParentList: string = '';
@@ -73,7 +71,9 @@ export class InfoComponent implements OnInit, CanDeactivate<InfoComponent> {
           code: item.code
         }
         this.api.editCourse(item.id, formattedItem).subscribe({
-          next: (res) => console.log(res),
+          next: (res) => {
+            alert("Data edited!")
+          },
           error: (err) => console.log(err)
         })
       } else if (item.programmename) {
@@ -85,23 +85,15 @@ export class InfoComponent implements OnInit, CanDeactivate<InfoComponent> {
           assignableIntake: item.assignableIntake
         }
         this.api.editProgramme(item.id, formattedItem).subscribe({
-          next: (res) => console.log(res),
+          next: (res) => {
+            console.log(res)
+            alert("Data edited!")
+          },
           error: (err) => console.log(err)
         })
       }
     })
     
-  }
-
-  canDeactivate(): Observable<boolean> | boolean {
-    if (this.hasChanges) {
-      return new Observable<boolean>(observer => {
-        const result = window.confirm('You have unsaved changes. Do you really want to leave?');
-        observer.next(result);
-        observer.complete();
-      });
-    }
-    return true;
   }
 
 }

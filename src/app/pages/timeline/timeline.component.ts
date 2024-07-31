@@ -1,9 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, OnChanges, SimpleChanges  } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef  } from '@angular/core';
 import { Timeline, DataSet } from 'vis-timeline/standalone';
-
-import { MatButtonModule } from '@angular/material/button';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { DataService } from 'src/app/services/data.service';
 import { MatSelectChange } from '@angular/material/select';
@@ -11,7 +7,6 @@ import { IGroup } from 'src/app/interfaces/group.interface';
 import { IIntake } from 'src/app/interfaces/intake.interface';
 
 import { ISemester } from 'src/app/interfaces/semester.interface';
-
 
 interface ITimeline {
   id: number;
@@ -120,8 +115,6 @@ export class TimelineComponent implements OnInit {
     })
   }
 
-  
-  // Formatting
   combineDataIntoTimeline(groups: IGroup[], intakes: IIntake[]): ITimeline[] {
     const timeline: ITimeline[] = [];
     let idCounter = 1;
@@ -157,7 +150,6 @@ export class TimelineComponent implements OnInit {
     return timeline;
   }
 
-  // Formatting
   transformData(semesters: ISemester[]): any[] {
     return semesters.map((semester, index) => ({
       
@@ -216,7 +208,6 @@ export class TimelineComponent implements OnInit {
   }
 
   onRefreshTimeline() {
-    console.log('refresh')
     this.loadTimelineDataset();
   }
 

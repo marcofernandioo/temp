@@ -71,6 +71,7 @@ import {NativeDateAdapter, DateAdapter, MatNativeDateModule} from '@angular/mate
     MatSelectModule,
     MatProgressSpinnerModule,
     MatIconModule,
+    MatNativeDateModule,
     TablerIconsModule.pick(TablerIcons),
     ToastrModule.forRoot()
   ],

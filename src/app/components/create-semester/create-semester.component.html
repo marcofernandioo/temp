@@ -17,14 +17,14 @@
           <h3>{{ range.label }}</h3>
           <mat-form-field appearance="fill">
               <mat-label>Start Date</mat-label>
-              <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+              <input matInput [matDatepicker]="startPicker" formControlName="startDate"  [matDatepickerFilter]="onlyMondays">
               <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
               <mat-datepicker #startPicker></mat-datepicker>
           </mat-form-field>
           
           <mat-form-field appearance="fill"> 
             <mat-label>End Date</mat-label>
-            <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+            <input matInput [matDatepicker]="endPicker" formControlName="endDate"  [matDatepickerFilter]="onlyMondays">
             <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
             <mat-datepicker #endPicker></mat-datepicker>
           </mat-form-field>

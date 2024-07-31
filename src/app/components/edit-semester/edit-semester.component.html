@@ -27,6 +27,7 @@
               matInput
               [matDatepicker]="startPicker"
               formControlName="startDate"
+              [matDatepickerFilter]="onlyMondays"
             />
             <mat-datepicker-toggle
               matSuffix
@@ -41,6 +42,7 @@
               matInput
               [matDatepicker]="endPicker"
               formControlName="endDate"
+              [matDatepickerFilter]="onlyMondays"
             />
             <mat-datepicker-toggle
               matSuffix
