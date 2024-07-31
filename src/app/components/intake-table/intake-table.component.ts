@@ -14,7 +14,7 @@ import { IIntake } from 'src/app/interfaces/intake.interface';
 })
 export class IntakeTableComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  displayedColumns: string[] = ['code', 'startdate', 'enddate'];
+  displayedColumns: string[] = ['code', 'orientation', 'startdate', 'enddate'];
   selectedYear: number | null = null;// temporary;
   yearList: number[] = [];
   yearlyIntakesAsTable!: MatTableDataSource<IIntake>;
@@ -72,18 +72,25 @@ export class IntakeTableComponent implements OnInit {
   }
 
   downloadCSV() {
-    const csvData = this.convertToCSV(this.yearlyIntakesAsTable.data);
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, `${this.selectedYear} Intakes.csv`);
+    if (this.selectedYear) {
+      const csvData = this.convertToCSV(this.yearlyIntakesAsTable.data, this.selectedYear.toString());
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      saveAs(blob, `${this.selectedYear} Intakes.csv`);
+    }
   }
 
-  convertToCSV(data: IIntake[]): string {
-    const header = ['Code', 'Start Date', 'End Date']; 
+    convertToCSV(data: IIntake[], year: string): string {
+    const header = ['Code', 'Orientation Date', 'Start Date', 'End Date']; 
     const csvRows = [header.join(',')];
-
-    for (const intake of data) {
+    const filteredData = data.filter((data) => {
+      const dateObj = new Date(data.startdate);
+      return dateObj.getFullYear() === parseInt(year)
+    }
+    )
+    for (const intake of filteredData) {
       const row = [
         intake.code,
+        this.formatDate(intake.orientation),
         this.formatDate(intake.startdate),
         this.formatDate(intake.enddate)
       ];

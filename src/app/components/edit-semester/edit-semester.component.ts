@@ -44,11 +44,13 @@ export class EditSemesterComponent implements OnInit, OnChanges {
     private cdr: ChangeDetectorRef
   ) { }
 
-  onlyMondays(date: any) {
+  onlyMondays(date: any | null) {
+    if (!date) 
+      date = new Date();
     var day = date.getDay();
     return day === 1;
   }
-  
+
   ngOnInit() {
     this.initForm();
   }

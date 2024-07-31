@@ -45,6 +45,8 @@ export class CreateIntakeComponent implements OnInit, OnChanges {
   }
 
   onlyMondays(date: any) {
+    if (!date) 
+      date = new Date();
     var day = date.getDay();
     return day === 1;
   }
